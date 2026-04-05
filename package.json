@@ -1,0 +1,36 @@
+{
+  "name": "patient-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch --conditions=development src/server.ts",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "imports": {
+    "#*": {
+      "development": "./src/*.ts",
+      "types": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "serverless-http": "^4.0.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.2",
+    "jest": "^30.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}
