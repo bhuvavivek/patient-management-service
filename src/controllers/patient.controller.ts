@@ -1,9 +1,11 @@
 import { type Request, type Response } from 'express';
+import { ZodError } from 'zod';
 import { PatientRepository } from '#services/patient.repository';
 import { PatientSchema, createPatientRecord } from '#models/patient.model';
-import { ZodError } from 'zod';
+import { SearchService } from '#services/search.service';
 
 const repo = new PatientRepository();
+const searchService = new SearchService();
 
 export const PatientController = {
     create: async (req: Request, res: Response) => {
@@ -59,6 +61,19 @@ export const PatientController = {
         }
 
         await repo.delete(id);
-        res.status(204).send(); // No content on successful delete
+        res.status(204).send();
+    },
+
+    searchByCondition: async (req: Request, res: Response) => {
+        const { q } = req.query;
+
+        if (typeof q != 'string') {
+            return res.status(400).json({
+                error: "Query parameter 'q' is required"
+            })
+        }
+
+        const patients = await searchService.searchByCondition(q);
+        res.json(patients);
     }
 };
