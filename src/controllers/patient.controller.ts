@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express';
 import { ZodError } from 'zod';
 import { PatientRepository } from '#services/patient.repository';
-import { PatientSchema, createPatientRecord } from '#models/patient.model';
+import { PatientSchema, createPatientRecord, type PatientInput, type PatientUpdateInput } from '#models/patient.model';
 import { SearchService } from '#services/search.service';
 
 const repo = new PatientRepository();
@@ -12,8 +12,8 @@ export const PatientController = {
         try {
             const validatedData = PatientSchema.parse(req.body);
             const patient = createPatientRecord(validatedData);
-
             await repo.create(patient);
+            await searchService.indexPatient(patient);
             res.status(201).json(patient);
         } catch (error) {
             if (error instanceof ZodError) {
@@ -61,6 +61,7 @@ export const PatientController = {
         }
 
         await repo.delete(id);
+        await searchService.removePatient(id);
         res.status(204).send();
     },
 
@@ -75,5 +76,17 @@ export const PatientController = {
 
         const patients = await searchService.searchByCondition(q);
         res.json(patients);
+    },
+
+    update: async (req: Request, res: Response) => {
+        const { id } = req.params;
+        if (typeof id !== 'string') return res.status(400).json({ error: "Invalid ID" });
+
+        const validatedData: PatientUpdateInput = PatientSchema.partial().parse(req.body);
+
+        await repo.update(id, validatedData);
+        await searchService.updatePatient(id, validatedData);
+
+        res.status(200).json({ message: "Patient updated successfully" });
     }
 };

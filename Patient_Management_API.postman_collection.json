@@ -1,0 +1,211 @@
+{
+	"info": {
+		"_postman_id": "c1f8a846-5db2-4d22-8df2-ff21b5b5ac30",
+		"name": "Patient Management API",
+		"description": "Serverless Patient Management REST API containing CRUD Operations.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": [
+                {
+                    "name": "Health Check Success",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "http://localhost:3000/health"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "body": "{\n    \"status\": \"UP\",\n    \"timestamp\": \"2024-01-01T12:00:00.000Z\"\n}"
+                }
+            ]
+		},
+		{
+			"name": "Create Patient",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer YOUR_JWT_TOKEN",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"John Doe\",\n  \"address\": \"400 Serverless St\",\n  \"conditions\": [\"Hypertension\"],\n  \"allergies\": [\"Aspirin\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/patients",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"patients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/patients/123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"patients",
+						"123"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Patient",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer YOUR_JWT_TOKEN",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"address\": \"800 Lambda Ave\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/patients/123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"patients",
+						"123"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search by Address",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/patients/search/address?address=400 Serverless St",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"patients",
+						"search",
+						"address"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "400 Serverless St"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search by Conditions (OpenSearch)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/patients/search/condition?q=hypertension",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"patients",
+						"search",
+						"condition"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "hypertension"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Patient",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer YOUR_JWT_TOKEN",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/patients/123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"patients",
+						"123"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

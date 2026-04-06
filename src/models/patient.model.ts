@@ -10,6 +10,9 @@ export const PatientSchema = z.object({
 
 // Typescript type from zod schema
 export type PatientInput = z.infer<typeof PatientSchema>;
+export type PatientUpdateInput = {
+    [K in keyof PatientInput]?: PatientInput[K] | undefined;
+};
 
 //  Interface Record for dynamodb
 export interface Patient extends PatientInput {

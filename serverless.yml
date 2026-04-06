@@ -1,0 +1,69 @@
+service: patient-management-api
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
+    OPENSEARCH_NODE: ${env:OPENSEARCH_NODE}
+    PATIENTS_TABLE: ${self:custom.patientsTableName}
+  # Important: Setting up IAM Role Permissions for Lambda
+  iam:
+    role:
+      statements:
+        # IAM specific permission for DynamoDB
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:PutItem"
+            - "dynamodb:GetItem"
+            - "dynamodb:UpdateItem"
+            - "dynamodb:DeleteItem"
+            - "dynamodb:Query"
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.patientsTableName}*"
+          
+        # IAM specific permission for OpenSearch
+        - Effect: "Allow"
+          Action:
+            - "es:ESHttpPost"
+            - "es:ESHttpPut"
+            - "es:ESHttpDelete"
+            - "es:ESHttpGet"
+          Resource: "arn:aws:es:${self:provider.region}:*:domain/*"
+
+custom:
+  patientsTableName: PatientsTable-${self:provider.stage}
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - httpApi: '*'
+
+# Note: CloudFormation resources can be provisioned here for DynamoDB and Cognito
+resources:
+  Resources:
+    PatientsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.patientsTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: patientId
+            AttributeType: S
+          - AttributeName: address
+            AttributeType: S
+        KeySchema:
+          - AttributeName: patientId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: AddressIndex
+            KeySchema:
+              - AttributeName: address
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

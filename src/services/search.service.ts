@@ -26,4 +26,42 @@ export class SearchService {
             return [];
         }
     }
+
+    async indexPatient(patient: any) {
+        try {
+            await searchClient.index({
+                index: INDEX_NAME,
+                id: patient.patientId,
+                body: patient
+            });
+            logger.info("Patient indexed in OpenSearch", { patientId: patient.patientId });
+        } catch (error) {
+            logger.error("Failed to index patient in OpenSearch", { error, patientId: patient.patientId });
+        }
+    }
+
+    async updatePatient(id: string, updates: any) {
+        try {
+            await searchClient.update({
+                index: INDEX_NAME,
+                id: id,
+                body: { doc: updates }
+            });
+            logger.info("Patient updated in OpenSearch", { patientId: id });
+        } catch (error) {
+            logger.error("Failed to update patient in OpenSearch", { error, patientId: id });
+        }
+    }
+
+    async removePatient(id: string) {
+        try {
+            await searchClient.delete({
+                index: INDEX_NAME,
+                id: id
+            });
+            logger.info("Patient removed from OpenSearch", { patientId: id });
+        } catch (error) {
+            logger.error("Failed to remove patient from OpenSearch", { error, patientId: id });
+        }
+    }
 }

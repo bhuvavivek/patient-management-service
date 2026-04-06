@@ -1,6 +1,6 @@
 import { PutCommand, GetCommand, DeleteCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { docClient } from "#config/dynamo.config";
-import { type Patient } from '#models/patient.model';
+import { type Patient, type PatientInput, type PatientUpdateInput } from '#models/patient.model';
 import { logger } from "#utils/logger";
 
 const TABLE_NAME = process.env.PATIENTS_TABLE || "PatientsTable";
@@ -38,5 +38,33 @@ export class PatientRepository {
             Key: { patientId: id },
         }));
         logger.info("Patient record deleted", { patientId: id });
+    }
+
+    async update(id: string, updates: PatientUpdateInput): Promise<void> {
+        const timestamp = new Date().toISOString();
+
+        const updateExpressions: string[] = ["#updatedAt = :updatedAt"];
+        const expressionAttributeNames: Record<string, string> = {
+            "#updatedAt": "updatedAt"
+        };
+        const expressionAttributeValues: Record<string, any> = {
+            ":updatedAt": timestamp
+        };
+
+        for (const [key, value] of Object.entries(updates)) {
+            if (value !== undefined) {
+                updateExpressions.push(`#${key} = :${key}`);
+                expressionAttributeNames[`#${key}`] = key;
+                expressionAttributeValues[`:${key}`] = value;
+            }
+        }
+
+        await docClient.send(new UpdateCommand({
+            TableName: TABLE_NAME,
+            Key: { patientId: id },
+            UpdateExpression: "set " + updateExpressions.join(", "),
+            ExpressionAttributeNames: expressionAttributeNames,
+            ExpressionAttributeValues: expressionAttributeValues,
+        }));
     }
 }
